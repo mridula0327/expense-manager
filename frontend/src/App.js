@@ -21,7 +21,7 @@ function App() {
 
   const [items, setItems] = useState([]);
 
-  const BASE_URL = "http://localhost:3000";
+  const BASE_URL = "https://expense-backend-isnc.onrender.com";
 
   // FORM CHANGE
   const handleChange = (e) => {
