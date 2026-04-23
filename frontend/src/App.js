@@ -10,27 +10,33 @@ function App() {
     password: ""
   });
 
-  const [expense, setExpense] = useState({
-    title: "",
-    amount: "",
-    category: ""
+  const [item, setItem] = useState({
+    itemName: "",
+    description: "",
+    type: "",
+    location: "",
+    date: "",
+    contactInfo: ""
   });
 
-  const [expenses, setExpenses] = useState([]);
+  const [items, setItems] = useState([]);
 
+  const BASE_URL = "http://localhost:3000";
+
+  // FORM CHANGE
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleExpenseChange = (e) => {
-    setExpense({ ...expense, [e.target.name]: e.target.value });
+  const handleItemChange = (e) => {
+    setItem({ ...item, [e.target.name]: e.target.value });
   };
 
   // REGISTER
   const register = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("https://expense-backend-isnc.onrender.com/api/register", {
+    const res = await fetch(`${BASE_URL}/api/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -47,7 +53,7 @@ function App() {
   const login = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("https://expense-backend-isnc.onrender.com/api/login", {
+    const res = await fetch(`${BASE_URL}/api/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -62,35 +68,32 @@ function App() {
     setPage("dashboard");
   };
 
-  // ADD EXPENSE
-  const addExpense = async () => {
-    await fetch("https://expense-backend-isnc.onrender.com/api/expense", {
+  // ADD ITEM
+  const addItem = async () => {
+    await fetch(`${BASE_URL}/api/item`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: token
       },
-      body: JSON.stringify(expense)
+      body: JSON.stringify(item)
     });
 
-    getExpenses();
+    getItems();
   };
 
-  // GET EXPENSES (FIXED)
-  const getExpenses = async () => {
-    const res = await fetch("https://expense-backend-isnc.onrender.com/api/expenses", {
+  // GET ITEMS
+  const getItems = async () => {
+    const res = await fetch(`${BASE_URL}/api/items`, {
       headers: { Authorization: token }
     });
 
     const data = await res.json();
-    console.log("API response:", data);
-
-    // FIX: ensure array
-    setExpenses(Array.isArray(data) ? data : data.expenses || []);
+    setItems(data);
   };
 
   useEffect(() => {
-    if (token) getExpenses();
+    if (token) getItems();
   }, [token]);
 
   // REGISTER PAGE
@@ -135,7 +138,7 @@ function App() {
   // DASHBOARD
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Dashboard</h2>
+      <h2>Lost & Found Dashboard</h2>
 
       <button onClick={() => {
         localStorage.removeItem("token");
@@ -147,17 +150,20 @@ function App() {
 
       <br /><br />
 
-      <input name="title" placeholder="Title" onChange={handleExpenseChange} /><br /><br />
-      <input name="amount" placeholder="Amount" onChange={handleExpenseChange} /><br /><br />
-      <input name="category" placeholder="Category" onChange={handleExpenseChange} /><br /><br />
+      <input name="itemName" placeholder="Item Name" onChange={handleItemChange} /><br /><br />
+      <input name="description" placeholder="Description" onChange={handleItemChange} /><br /><br />
+      <input name="type" placeholder="Type (Lost/Found)" onChange={handleItemChange} /><br /><br />
+      <input name="location" placeholder="Location" onChange={handleItemChange} /><br /><br />
+      <input name="date" placeholder="Date" onChange={handleItemChange} /><br /><br />
+      <input name="contactInfo" placeholder="Contact Info" onChange={handleItemChange} /><br /><br />
 
-      <button onClick={addExpense}>Add Expense</button>
+      <button onClick={addItem}>Add Item</button>
 
-      <h3>Your Expenses:</h3>
+      <h3>Items:</h3>
       <ul>
-        {Array.isArray(expenses) && expenses.map((exp, i) => (
+        {items.map((it, i) => (
           <li key={i}>
-            {exp.title} - ₹{exp.amount} ({exp.category})
+            {it.itemName} - {it.type} ({it.location})
           </li>
         ))}
       </ul>

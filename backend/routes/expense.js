@@ -1,33 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const Expense = require("../models/Expense");
+const Item = require("../models/Expense"); // file name same, model Item hai
 const auth = require("../middleware/auth");
 
-// ADD EXPENSE (Protected)
-router.post("/expense", auth, async (req, res) => {
+// ➕ ADD ITEM (Lost / Found)
+router.post("/item", auth, async (req, res) => {
   try {
-    const { title, amount, category } = req.body;
-
-    const expense = new Expense({
-      user: req.user.id,
-      title,
-      amount,
-      category
+    const item = new Item({
+      ...req.body,
+      user: req.user.id
     });
 
-    await expense.save();
+    await item.save();
+    res.json({ msg: "Item added successfully" });
 
-    res.json({ msg: "Expense added" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET ALL EXPENSES (Protected)
-router.get("/expenses", auth, async (req, res) => {
+// 📥 GET ALL ITEMS
+router.get("/items", auth, async (req, res) => {
   try {
-    const expenses = await Expense.find({ user: req.user.id });
-    res.json(expenses);
+    const items = await Item.find({ user: req.user.id });
+    res.json(items);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
